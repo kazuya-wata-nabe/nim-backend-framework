@@ -1,0 +1,5 @@
+{
+  "nim.notificationTimeout": 15,
+  "nim.lintOnSave": true,
+  "nim.formatOnSave": true,
+}

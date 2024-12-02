@@ -1,0 +1,8 @@
+*
+!*.*
+!*/
+
+.DS_Store
+*.sqlite3
+
+_deps/*
