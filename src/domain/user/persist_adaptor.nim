@@ -2,6 +2,7 @@ import std/json
 import std/os
 
 import src/domain/user/repository
+import src/domain/json_repository_adaptor
 
 
 type UserJsonRepository* = ref object
@@ -9,23 +10,13 @@ type UserJsonRepository* = ref object
 proc newUserJsonRepository*(): UserJsonRepository = UserJsonRepository()
 
 
-func list(self: UserJsonRepository, params: ListParams): seq[User] =
-  @[
-    newUser("test1"),
-    newUser("test2"),
-    newUser("test3"),
-  ]
+proc list(self: UserJsonRepository, params: ListParams): seq[User] =
+  let users = readJson(User())
+  for user in users:
+    result.add to(user, User)
 
 proc save(self: UserJsonRepository, user: User) =
-  let userJson = %*{
-    "id": user.id,
-    "name": user.name,
-  }
-
-  let path = getCurrentDir() & "/db.json"
-  let f = open(path, fmWrite)
-  f.write(userJson.pretty())
-  f.close()
+  writeJson(user)
 
 
 proc toInterface*(self: UserJsonRepository): UserRepository =
@@ -36,4 +27,7 @@ proc toInterface*(self: UserJsonRepository): UserRepository =
 
 
 when isMainModule:
-  discard
+  # UserJsonRepository().save(newUser("test2"))
+  let users = UserJsonRepository().list(ListParams())
+  for user in users:
+    echo user.name

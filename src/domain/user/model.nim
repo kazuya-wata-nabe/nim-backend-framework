@@ -14,15 +14,16 @@ func newUserName(value: string): Username =
 
 
 type User* = ref object
-  id: string
+  id: int64
   name: Username
 
+func tableName*(self: User): string = "users"
 
 func newUser*(name: string): User =
-  User(id: "1", name: newUserName name)
+  User(name: newUserName name)
 
 
-func id*(self: User): string = self.id
+func id*(self: User): int64 = self.id
 func name*(self: User): Username = self.name
 
 when isMainModule:
