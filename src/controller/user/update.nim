@@ -3,12 +3,19 @@ import std/strutils
 import std/options
 
 import src/controller/shared
+import src/validation/[validator, rules]
+
+type UnValidateForm = ref object
+  name{.required.}: Option[string]
+  age{.required.}: Option[int]
+
+type ValidateForm = ref object
+  name: string
+  age: string
 
 type ValidForm = ref object
-  name: string
 
-
-func validate(form: JsonNode): Form[ValidForm] =
+func validate(form: JsonNode): ValidateForm =
   var errors = newSeqOfCap[string](10)
   let name = form.getStr(key = "name")
   if name.isEmptyOrWhitespace:

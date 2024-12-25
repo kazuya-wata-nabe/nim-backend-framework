@@ -27,7 +27,7 @@ proc toInterface*(self: UserJsonRepository): UserRepository =
 
 
 when isMainModule:
-  # UserJsonRepository().save(newUser("test2"))
+  UserJsonRepository().save(newUser("test2"))
   let users = UserJsonRepository().list(ListParams())
   for user in users:
     echo user.name

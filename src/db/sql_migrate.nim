@@ -29,7 +29,7 @@ when isMainModule:
 
   for d in parseDDL(ddl):
     echo db.tryExec sql(d)
-  
+
   let query = "select * from users;"
   for row in db.fastRows(sql query):
     echo row

@@ -28,4 +28,4 @@ func name*(self: User): Username = self.name
 
 when isMainModule:
   let user = newUser("hoge")
-  echo (%* user)
+  echo ( %* user)

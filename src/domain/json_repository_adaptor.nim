@@ -7,7 +7,7 @@ import src/domain/basemodel
 proc getPath(tableName: string): string = getCurrentDir() & "/" & tableName & ".json"
 
 
-proc readJson*(t: ReadModel): JsonNode = 
+proc readJson*(t: ReadModel): JsonNode =
   let path = getPath(t.tableName)
   let f = readFile(path)
   parseJson f
@@ -18,7 +18,7 @@ proc writeJson*(t: WriteModel) =
   let mode = if fileExists(path): fmReadWriteExisting else: fmReadWrite
   let f = open(path, mode)
   defer: f.close()
-  
+
   let jsonNode = %* t
   if f.endOfFile():
     jsonNode{"id"} = newJInt(1)
@@ -29,8 +29,9 @@ proc writeJson*(t: WriteModel) =
     var id = 1
     while not f.endOfFile():
       let line = f.readLine()
-      if line.contains("},") or line.contains(",{"):
-         id.inc()
+      # FIXME: minifyされたjsonの場合は正しいidを採番できない
+      if line.contains("},") or line.contains(",{") or line.endsWith("}"):
+        id.inc()
     let pos = f.getFilePos() - 2
     f.setFilePos(pos)
     jsonNode{"id"} = newJInt(id)

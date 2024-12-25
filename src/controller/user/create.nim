@@ -6,8 +6,8 @@ import src/domain/user/model
 import src/controller/shared
 
 type UnValidatedForm = ref object
-  name: string
-  email: string
+  name: Option[string]
+  email: Option[string]
 
 type ValidForm = ref object
   name: string
