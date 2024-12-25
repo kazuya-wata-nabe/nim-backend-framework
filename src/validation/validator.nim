@@ -4,6 +4,9 @@ import std/strutils
 import std/strformat
 
 import src/validation/rules
+import src/lib/parser_macros
+
+export rules
 
 type
   PragmaDef = object
@@ -13,11 +16,6 @@ type
   Field = object
     name: string
     pragmas: seq[PragmaDef]
-
-  ValidationError* = ref object
-    name*: string
-    rule*: string
-    params*: seq[string]
 
 
 func newPragmaDef(pragma: NimNode): PragmaDef{.compileTime.} =
@@ -37,17 +35,10 @@ func newField(pragmaExpr: NimNode): Field{.compileTime.} =
   Field(name: name.repr, pragmas: pragmasDefs)
 
 
-func getPragmaExprs(node: NimNode): seq[NimNode]{.compileTime.} =
-  let identDefs = toSeq(node.children)
-  for identDef in identDefs:
-    result.add identDef[0]
-
-
-macro generateValidator(t: typedesc): untyped =
-  let impl = getTypeInst(t)[1].getImpl()
-  let typename = impl[0]
-  let recList = impl[2][0][2]
-  let pragmaExprs = getPragmaExprs(recList)
+macro generateValidator*(t: typedesc): untyped =
+  let impl = getImpl(t)
+  let recList = findChildRec(impl, nnkRecList)
+  let pragmaExprs = recList.mapIt(it[0])
   let fields = pragmaExprs.mapIt(newField(it))
 
   var stmtList = newStmtList()
@@ -55,17 +46,16 @@ macro generateValidator(t: typedesc): untyped =
     for pragma in field.pragmas:
       let params = pragma.params.join(",")
       stmtList.add parseStmt &"""
-        if not t.{field.name}.{pragma.name}({params}): 
-          errors.add ValidationRule.{pragma.name}("{field.name}",{params})
+      if not self.{field.name}.{pragma.name}({params}): 
+        result.add ValidationRule.{pragma.name}("{field.name}",{params})
       """
-  let t = ident("t")
-  let errors = ident("errors")
+  let self = ident("self")
+
   quote do:
-    func validate*(`t`: `typename`): seq[string] =
-      var `errors` = newSeqOfCap[string](20)
+    func validate*(`self`: `t`): seq[string] =
+      result  = newSeqOfCap[string](20)
 
       `stmtList`
-      `errors`
 
 
 when isMainModule:

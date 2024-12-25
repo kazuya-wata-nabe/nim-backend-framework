@@ -21,6 +21,7 @@ proc initRouter(req: Request) {.async.} =
 proc main() {.async.} =
   var server = newAsyncHttpServer()
   let settings = newSettings()
+  let router = proc(req: Request){.async.} = initRouter(req)
 
   server.listen(Port settings.port)
   let port = server.getPort
@@ -28,7 +29,7 @@ proc main() {.async.} =
 
   while true:
     if server.shouldAcceptRequest():
-      await server.acceptRequest(initRouter)
+      await server.acceptRequest(router)
     else:
       # too many concurrent connections, `maxFDs` exceeded
       # wait 500ms for FDs to be closed

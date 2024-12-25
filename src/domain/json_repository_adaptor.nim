@@ -7,6 +7,10 @@ import src/domain/basemodel
 proc getPath(tableName: string): string = getCurrentDir() & "/" & tableName & ".json"
 
 
+func toSeq*[T](node: JsonNode, t: typedesc[T]): seq[T] =
+  for n in node:
+    result.add to(node, t)
+
 proc readJson*(t: ReadModel): JsonNode =
   let path = getPath(t.tableName)
   let f = readFile(path)

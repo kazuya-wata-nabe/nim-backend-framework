@@ -1,61 +1,44 @@
 import std/json
 import std/options
-import std/strutils
 
-import src/domain/user/model
 import src/controller/shared
+import src/validation/[validator, rules]
 
-type UnValidatedForm = ref object
-  name: Option[string]
-  email: Option[string]
+type UnValidateForm = ref object
+  name{.required.}: Option[string]
+  age{.required.}: Option[int]
 
-type ValidForm = ref object
+type ValidateForm = ref object
   name: string
-  email: string
+  age: string
+
+type ResultKind = enum
+  kOk, kErr
+
+type ValidationResult = ref object
+  case kind: ResultKind
+  of kOk:
+    form: ValidateForm
+  of kErr:
+    errors: seq[string]
 
 
-func validate(form: UnValidatedForm): tuple[valid: Option[ValidForm],
-    invalid: Option[InValidForm]] =
-  var errors = newSeqOfCap[string](10)
-  if form.name.isEmptyOrWhitespace:
-    errors.add "name: required"
+generateValidator(UnValidateForm)
 
+func validate(node: JsonNode): ValidationResult =
+  let value = to(node, UnValidateForm)
+  let errors = value.validate()
   if errors.len > 0:
-    newInValidForm(ValidForm, errors)
+    ValidationResult(kind: kErr, errors: errors)
   else:
-    newValidForm(ValidForm(name: name))
-
-
-proc convertBodyToJson(body: string): JsonNode =
-  try:
-    parseJson body
-  except:
-    %* {}
+    let form = ValidateForm(name: value.name.get, age: $value.age.get)
+    ValidationResult(kind: kOk, form: form)
 
 
 proc createUser*(body: string): tuple[status: int, value: JsonNode] =
-  let form = to(convertBodyToJson body, UnValidatedForm).validate
-  if form.valid.isSome:
-    let user = newUser(name = form.valid.get.name)
-    (201, %* user)
-  elif form.invalid.isSome:
-    (400, %* form.invalid.getErrors())
+  let form = validate(convertBodyToJson body)
+  if form.kind == kOk:
+    (204, %* form.form)
   else:
-    (500, %* "system error")
-
-
-
-when isMainModule:
-  doAssert convertBodyToJson("""{"hoge": 1}""") == ( %* {"hoge": 1})
-  doAssert convertBodyToJson("""{hoge: 1}""") == ( %* {})
-
-  block:
-    let form = validate( %* {"hoge": 1})
-    doAssert form.invalid.isSome == true
-    doAssert form.invalid.getErrors == "name: required"
-    doAssert form.valid.isNone == true
-
-  block:
-    let (status, value) = createUser("{\"name\": \"hoge\"}")
-    doAssert status == 201
-    doAssert value["name"].getStr() == "hoge"
+    (400, %* form.errors)
+  

@@ -36,3 +36,7 @@ task db_init, "initialize database":
 
 task db_migrate, "migrate":
   exec "echo date"
+
+
+task test_unit, "run testament":
+  exec """testament p "tests/**/*.nim""""

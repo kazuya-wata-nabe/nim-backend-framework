@@ -9,9 +9,9 @@ func required*(field: string): bool =
 func required*(field: int): bool =
   field > 0
 func required*(field: Option[string]): bool =
-  if field.isSome: required(field.get) else: false
+  if field.isSome(): required(field.get) else: false
 func required*(field: Option[int]): bool =
-  if field.isSome: required(field.get) else: false
+  if field.isSome(): required(field.get) else: false
 func required*(_: type ValidationRule, field: string): string =
   &"{field} is required"
 
