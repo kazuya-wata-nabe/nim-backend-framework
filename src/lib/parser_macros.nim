@@ -15,10 +15,10 @@ type
 
 func findChildRec(node: seq[NimNode], kind: NimNodeKind): NimNode =
   for n in node:
-    result = n.findChild(it.kind == kind)
-    if not result.isNil:
-      return
-    if result.isNil and n.len > 0:
+    let child = n.findChild(it.kind == kind)
+    if not child.isNil:
+      return child
+    if n.len > 0:
       let children =  toSeq(n.children)
       return findChildRec(children, kind)
   
