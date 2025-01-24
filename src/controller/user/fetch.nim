@@ -1,13 +1,11 @@
-import src/domain/user/model
+import std/json
+import src/domain/user/usecase/list
 
 export `%`
 
-func fetchUsers*(): seq[User] =
-  @[
-    newUser(name = "foo"),
-    newUser(name = "bar"),
-    newUser(name = "bob"),
-  ]
 
-func fetchUser*(id: string): User =
-  newUser(name = "tom")
+proc fetchUsers*(usecase: ListUsecase, req: string): seq[User] =
+  usecase.invoke(parseJson req)
+
+# func fetchUser*(id: string): User =
+#   newUser(name = "tom")

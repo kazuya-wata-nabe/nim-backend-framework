@@ -1,5 +1,8 @@
 import std/os
 import std/strutils
+import std/json
+
+export json
 
 type Settings* = ref object
   port: uint

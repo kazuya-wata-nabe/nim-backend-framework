@@ -1,8 +1,6 @@
 import std/json
-import std/os
 
 import src/domain/user/repository
-import src/domain/json_repository_adaptor
 import src/db/conn
 
 
