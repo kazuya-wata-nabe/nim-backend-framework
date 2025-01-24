@@ -18,7 +18,6 @@ type InsertQuery = ref object
   values: seq[JsonNode]
 
 
-func dbConn*(): Db = open(":memory:", "", "", "")
 func dbConn*(filename: string): Db = open(filename, "", "", "")
 
 
@@ -64,6 +63,16 @@ func find*(db: Db, t: ReadModel, where: seq[tuple[key: string,
 func find*(db: Db, t: ReadModel): seq[Row] =
   let query = &"""select * from {t.tableName}"""
   db.getAllRow(sql query, t.id)
+
+
+when not defined(release):
+  template withOnMemoryDb*(db, op: untyped): untyped =
+    var db = dbConn(":memory:")
+    let ddl = @[
+      """drop table if exists users;""",
+      """create table users (id integer primary key autoincrement, name text, age integer) STRICT;""",
+    ]
+    op
 
 
 when isMainModule:

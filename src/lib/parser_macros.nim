@@ -23,7 +23,7 @@ func findChildRec(node: seq[NimNode], kind: NimNodeKind): NimNode =
       return findChildRec(children, kind)
   
 func findChildRec*(node: NimNode, kind: NimNodeKind): NimNode =
-  findChildRec(@[node], kind)
+   findChildRec(@[node], kind)
 
 ## dumpTree:
 ##  type User = ref object
