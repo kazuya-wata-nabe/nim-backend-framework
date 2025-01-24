@@ -5,7 +5,7 @@ author        = "kazuya-wata-nabe"
 description   = "A new awesome nimble package"
 license       = "MIT"
 srcDir        = "src"
-bin           = @["main"]
+bin           = @["server"]
 
 # Dependencies
 
