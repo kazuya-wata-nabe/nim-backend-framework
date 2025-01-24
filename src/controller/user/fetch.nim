@@ -5,7 +5,7 @@ export `%`
 
 
 proc fetchUsers*(usecase: ListUsecase, req: string): seq[User] =
-  usecase.invoke(parseJson req)
+  usecase.invoke(req)
 
 # func fetchUser*(id: string): User =
 #   newUser(name = "tom")

@@ -76,7 +76,7 @@ proc create*(db: DbConn, t: WriteModel): int64 =
 iterator selectAll*(db: DbConn, t: ReadModel): JsonNode =
   let (columns, values) = t.build()
   let typeNames = getNodeTypes(t)
-  let query = &"""select {columns} from {t.tableName} LIMIT 100;"""
+  let query = &"""select {columns} from {t.tableName};"""
   let fields = columns.split(",")
   try:
     for row in db.getAllRows(sql query):
@@ -115,14 +115,15 @@ when not defined(release):
       for i, d in ddl:
         yield d & ";"
 
-
-  template withOnMemoryDb*(db, op: untyped): untyped =
-    var db = dbConn(":memory:")
+  
+  proc execDDL(db: DbConn) =
     for ddl in ddlList():
       let success = db.tryExec(sql ddl)
       if not success:
         echo ddl & " is failure"
 
+  template withOnMemoryDb*(db, op: untyped): untyped =
+    var db = dbConn(":memory:")
     op
 
   template withDb*(filename: string, db, op: untyped): untyped =
@@ -132,6 +133,12 @@ when not defined(release):
 
 
 when isMainModule:
-  withOnMemoryDb db:
-    let rows = db.getAllRows(sql "select * from users;")
-    echo rows
+  if paramCount() > 0 and paramStr(1) == "--migrate":
+    withDb getCurrentDir() & "/db.sqlite3", db:
+      execDDL(db)
+
+  if paramCount() > 0 and paramStr(1) == "--seed":
+    withDb getCurrentDir() & "/db.sqlite3", db:
+      db.exec(sql """insert into users (name) values ("hoge");""")
+
+    

@@ -3,6 +3,7 @@ import std/asyncdispatch
 import std/json
 import std/strutils
 import std/os
+import std/sugar
 import db_connector/db_sqlite
 
 import ./utils
@@ -30,7 +31,7 @@ type Controllers = ref object
 proc initRouter(c: Controllers, req: Request) {.async.} =
   if req.url.path == "/users" and req.reqMethod == HttpGet:
     let data = c.user.list.invoke(req.body)
-    await req.json(Http200, "data")
+    await req.json(Http200, data)
 
 
   GROUP req, "/pets":

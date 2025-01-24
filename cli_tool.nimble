@@ -30,12 +30,13 @@ task sweep, "remove binary file":
 task server, "start server":
   exec "nim c -r src/server.nim"
 
-task db_init, "initialize database":
-  exec "echo .open db.sqlite3 | sqlite3"
-
 
 task db_migrate, "migrate":
-  exec "echo date"
+  rmFile "db.sqlite3"
+  exec "echo .open db.sqlite3 | sqlite3"
+  exec """nim c -r src/db/conn --migrate"""
+  exec """nim c -r src/db/conn --seed"""
+
 
 
 task test_unit, "run testament":
