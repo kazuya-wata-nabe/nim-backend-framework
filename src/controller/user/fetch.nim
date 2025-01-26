@@ -1,11 +1,19 @@
-import std/json
 import src/domain/user/usecase/list
 
-export `%`
+import src/controller/shared
+
+type UserController* = ref object 
+  list: ListUsecase
 
 
-proc fetchUsers*(usecase: ListUsecase, req: string): seq[User] =
-  usecase.invoke(req)
+func newUserController*(list: ListUsecase): UserController =
+  UserController(list: list)
+
+
+template fetchUsers*(self, req: untyped): untyped =
+  let data = self.list.invoke(convertBodyToJson req.body)
+  req.json(Http200, data)
+
 
 # func fetchUser*(id: string): User =
 #   newUser(name = "tom")

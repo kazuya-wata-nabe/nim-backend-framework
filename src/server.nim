@@ -1,37 +1,29 @@
 import std/asynchttpserver
 import std/asyncdispatch
-import std/json
 import std/strutils
-import std/os
 import std/sugar
-import db_connector/db_sqlite
 
 import ./utils
 import src/lib/utils
-import ./controller
 import src/router
-import src/route/[user]
 import ./handler
 import src/db/conn
 
-import src/domain/user/[model, repository, persist/sqlite]
-import src/domain/user/usecase/[list]
-
-
-
-
-type UserController = ref object 
-  list: ListUsecase
-  # create: ListUser
+import src/domain/user/[model, usecase/list, persist/sqlite]
+import src/controller/user/[fetch]
 
 type Controllers = ref object
-  user: UserController
+  # user: UserController
+  cart: proc(req: Request): Future[void]{.gcsafe.}
 
 
 proc initRouter(c: Controllers, req: Request) {.async.} =
-  if req.url.path == "/users" and req.reqMethod == HttpGet:
-    let data = c.user.list.invoke(req.body)
-    await req.json(Http200, data)
+  # GROUP req, "/users":
+  #   LIST:
+  #     await c.user.fetchUsers(req)
+
+  
+  await c.cart(req)
 
 
   GROUP req, "/pets":
@@ -41,20 +33,20 @@ proc initRouter(c: Controllers, req: Request) {.async.} =
   await req.text(Http404, $Http404)
 
 
-func newUserController(list: ListUsecase): UserController =
-  UserController(list: list)
-
-
 proc main() {.async.} =
   var server = newAsyncHttpServer()
   let settings = newSettings()
   let db = dbConn("db.sqlite3")
 
   let controllers = Controllers(
-    user: db |> newUserRepository |> newListUsecase |> newUserController
+    # user: db |> newUserRepository |> newListUsecase |> newUserController,
+    cart: proc(req: Request): Future[void] = 
+      if req.url.path == "/cart":
+        result = req.json(Http200, "data")
   )
   
-  let router = proc(req: Request){.async.} = initRouter(controllers, req)
+  let router = proc(req: Request){.async.} = 
+    initRouter(controllers, req)
 
   server.listen(Port settings.port)
   let port = server.getPort
@@ -64,8 +56,6 @@ proc main() {.async.} =
     if server.shouldAcceptRequest():
       await server.acceptRequest(router)
     else:
-      # too many concurrent connections, `maxFDs` exceeded
-      # wait 500ms for FDs to be closed
       await sleepAsync(500)
 
 waitFor main()

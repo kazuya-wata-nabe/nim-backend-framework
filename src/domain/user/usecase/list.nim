@@ -10,6 +10,6 @@ func newListUsecase*(repository: UserRepository): ListUsecase =
   ListUsecase(repository: repository)
 
 
-proc invoke*(self: ListUsecase, params: string): seq[User] = 
+proc invoke*(self: ListUsecase, params: JsonNode): seq[User] = 
   let query = ListParams()
   self.repository.list(query)
