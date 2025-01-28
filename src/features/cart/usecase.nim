@@ -1,23 +1,18 @@
-import ./model
 import std/json
-import src/validation/request_port
 
-type CartItemAddUsecase* = proc(jsonNode: JsonNode): ShoppingCart
+import src/validation/request_port
+import ./model
 
 type 
   QueryService = ref object
-  CartItemAddUsecaseWithQueryService* = ref object
+  CartItemAddUsecase* = ref object
     queryService: QueryService
+  ShoppingCartOutDto = JsonNode
 
 generateUnMarshal(ShoppingCartItem)
 
-proc cartItemAddUsecase*(jsonNode: JsonNode): ShoppingCart =
+
+proc invoke*(self: CartItemAddUsecase, jsonNode: JsonNode): ShoppingCartOutDto =
   let cart = newShoppingCart()
   let item = unmarshal(jsonNode, ShoppingCartItem)
-  cart.add(item)
-
-
-proc invoke*(self: CartItemAddUsecaseWithQueryService, jsonNode: JsonNode): ShoppingCart =
-  let cart = newShoppingCart()
-  let item = unmarshal(jsonNode, ShoppingCartItem)
-  cart.add(item)
+  %* cart.add(item)

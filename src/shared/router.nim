@@ -18,6 +18,7 @@ func slice(value: string, pos: int): string =
 
 # TODO: support nested group
 macro GROUP*(req, prefix, body: untyped) =
+  req.expectKind nnkIdent
   prefix.expectKind nnkStrLit
   let path = ident "path"
   quote do:

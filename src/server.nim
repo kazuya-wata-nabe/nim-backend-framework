@@ -1,9 +1,12 @@
 import std/asynchttpserver
 import std/asyncdispatch
 import std/strutils
+import src/lib/utils
 
 import src/db/conn
-import src/features/cart/controller/[update]
+import src/shared/router
+
+import src/features/cart/[usecase, controller/update]
 
 
 type Settings = ref object
@@ -23,17 +26,22 @@ func port*(self: Settings): uint16 =
 
 
 
+
 proc main() {.async.} =
   var server = newAsyncHttpServer()
   let settings = newSettings()
   let db = dbConn("db.sqlite3")
 
+  let cont = CartUpdateController.new()
 
-  let router = proc(req: Request){.async.} =    
+
+  let router = proc(req: Request){.async.} =
+    GROUP req, "/cart":
+      if req.reqMethod == HttpPut:
+        await cont.UPDATE()
+
     await req.respond(Http404, $Http404)
 
-
-    
 
   server.listen(Port settings.port)
   let port = server.getPort
