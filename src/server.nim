@@ -1,38 +1,27 @@
 import std/asynchttpserver
 import std/asyncdispatch
 import std/strutils
-import std/sugar
 
-import ./utils
-import src/lib/utils
-import src/router
-import ./handler
 import src/db/conn
-
-import src/domain/user/[model, usecase/list, persist/sqlite]
-import src/controller/user/[fetch]
-import src/controller/cart/[update]
-import src/features/cart/[http_port, usecase]
+import src/features/cart/controller/[update]
 
 
-
-template initRouter(req: Request): untyped =
-  # GROUP req, "/users":
-  #   LIST:
-  #     await c.user.fetchUsers(req)
-  # await c.cart(req)
-  if req.url.path == "/cart":
-    await CartUpdateController.invoke(cartItemAddUsecase, req)
+type Settings = ref object
+  port: uint
 
 
-  GROUP req, "/pets":
-    LIST:
-      await req.json(Http200, "pets")
+func newSettings*(params: seq[string] = @[]): Settings =
+  result = Settings(port: 5000)
 
-  await req.text(Http404, $Http404)
+  for i, param in params:
+    if param == "--port" and params.len >= i + 1:
+      result.port = parseUInt params[i + 1]
 
 
-CartUpdateController.build(CartItemAddUsecaseWithQueryService())
+func port*(self: Settings): uint16 =
+  self.port.uint16
+
+
 
 proc main() {.async.} =
   var server = newAsyncHttpServer()
@@ -40,11 +29,8 @@ proc main() {.async.} =
   let db = dbConn("db.sqlite3")
 
 
-  let router = proc(req: Request){.async.} =
-    if req.url.path == "/cart":
-      await CartUpdateController.GET(req)
-    #   await CartUpdateController.call()
-    await req.text(Http404, $Http404)
+  let router = proc(req: Request){.async.} =    
+    await req.respond(Http404, $Http404)
 
 
     
