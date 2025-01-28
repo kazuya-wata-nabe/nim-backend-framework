@@ -32,7 +32,7 @@ template initRouter(req: Request): untyped =
   await req.text(Http404, $Http404)
 
 
-CartUpdateController.build(cartItemAddUsecase)
+CartUpdateController.build(CartItemAddUsecaseWithQueryService())
 
 proc main() {.async.} =
   var server = newAsyncHttpServer()

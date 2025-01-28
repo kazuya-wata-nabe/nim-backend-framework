@@ -1,5 +1,5 @@
 {
-  "nim.notificationTimeout": 15,
+  // "nim.notificationTimeout": 15,
   "nim.formatOnSave": true,
   "nim.buildOnSave": true,
   "nim.inlayHints.exceptionHints.enable": false,
