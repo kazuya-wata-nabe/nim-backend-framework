@@ -19,11 +19,11 @@ func findChildRec(node: seq[NimNode], kind: NimNodeKind): NimNode =
     if not child.isNil:
       return child
     if n.len > 0:
-      let children =  toSeq(n.children)
+      let children = toSeq(n.children)
       return findChildRec(children, kind)
-  
+
 func findChildRec*(node: NimNode, kind: NimNodeKind): NimNode =
-   findChildRec(@[node], kind)
+  findChildRec(@[node], kind)
 
 ## dumpTree:
 ##  type User = ref object

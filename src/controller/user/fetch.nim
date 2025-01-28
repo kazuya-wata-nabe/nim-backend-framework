@@ -2,7 +2,7 @@ import src/domain/user/usecase/list
 
 import src/controller/shared
 
-type UserController* = ref object 
+type UserController* = ref object
   list: ListUsecase
 
 

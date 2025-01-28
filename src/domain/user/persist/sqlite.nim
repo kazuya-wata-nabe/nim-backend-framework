@@ -23,7 +23,7 @@ proc toInterface*(self: UserRepositoryOnSqlite): UserRepository =
   )
 
 
-proc newUserRepository*(dbconn: DbConn): UserRepository = 
+proc newUserRepository*(dbconn: DbConn): UserRepository =
   UserRepositoryOnSqlite(dbConn: dbConn).toInterface()
 
 
@@ -31,7 +31,7 @@ when isMainModule:
   withOnMemoryDb db:
     let r = newUserRepository(db)
     r.save(newUser("test2"))
-  
+
     let users = r.list(ListParams())
     for user in users:
       echo user.name

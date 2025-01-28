@@ -33,12 +33,12 @@ func toStructVal(node: JsonNode, val: JsonNode): JsonNode =
   case val.kind
   of JInt: newJInt(node.getStr().parseInt())
   else: node
-  
+
 func convert(node: JsonNode, typenames: seq[JsonNode]): JsonNode =
   result = node
   for i, key in toSeq(node.keys):
     result[key] = toStructVal(node[key], typenames[i])
-  
+
 
 func deserialize(jsonNode: JsonNode, typename: string): JsonNode =
   result = jsonNode
@@ -48,7 +48,7 @@ func deserialize(jsonNode: JsonNode, typename: string): JsonNode =
 
 func build(t: ref object, skipId: bool = false): tuple[
     columns: string, values: seq[string]] =
-  let pairs = toSeq((%* t).pairs)
+  let pairs = toSeq(( %* t).pairs)
   for i, pair in pairs:
     if skipId and pair.key == "id":
       continue
@@ -57,7 +57,7 @@ func build(t: ref object, skipId: bool = false): tuple[
 
 # TODO: to macro
 func getNodeTypes(t: ref object): seq[JsonNode] =
-  let pairs = toSeq((%* t).pairs)
+  let pairs = toSeq(( %* t).pairs)
   for i, pair in pairs:
     result.add pair.val
 
@@ -108,14 +108,14 @@ func find*(db: DbConn, t: ReadModel): seq[Row] =
 when not defined(release):
   import std/os
 
-  iterator ddlList(): string = 
+  iterator ddlList(): string =
     let files = toSeq(walkFiles(getCurrentDir() & "/src/db/migration/*.sql"))
     for file in files:
       let ddl = readFile(file).split(";").filterIt(not it.isEmptyOrWhitespace())
       for i, d in ddl:
         yield d & ";"
 
-  
+
   proc execDDL(db: DbConn) =
     for ddl in ddlList():
       let success = db.tryExec(sql ddl)
@@ -141,4 +141,4 @@ when isMainModule:
     withDb getCurrentDir() & "/db.sqlite3", db:
       db.exec(sql """insert into users (name) values ("hoge");""")
 
-    
+

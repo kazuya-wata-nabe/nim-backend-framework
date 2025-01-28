@@ -53,7 +53,7 @@ macro generateValidator*(t: typedesc): untyped =
 
   quote do:
     func validate*(`self`: `t`): seq[string] =
-      result  = newSeqOfCap[string](20)
+      result = newSeqOfCap[string](20)
 
       `stmtList`
 

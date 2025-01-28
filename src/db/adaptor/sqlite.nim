@@ -47,7 +47,7 @@ func toKebabCase(str: string): string =
   result = $str[0].toLowerAscii()
   for c in str[1..^1]:
     debugEcho c
-    let prefix = if c in UppercaseLetters: "-" else : ""
+    let prefix = if c in UppercaseLetters: "-" else: ""
     result.add prefix & c.toLowerAscii()
 
 
@@ -71,13 +71,13 @@ macro generateORM(node: typedesc): untyped =
 
   let exp = typeName.repr.toTableName()
   let columns = ""
-  
+
   quote do:
     echo `exp`
 
 
 when isMainModule:
-  
+
   type Todo = ref object of RootObj
     name: string
   generateORM(Todo)

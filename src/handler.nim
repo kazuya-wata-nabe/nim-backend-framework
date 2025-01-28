@@ -2,6 +2,13 @@ import std/asynchttpserver
 import std/asyncdispatch
 import std/json
 
+export asynchttpserver
+export asyncdispatch
+
+# type Response* = Future[void]
+# type Handler* = proc(req: Request): Response{.gcsafe.}
+
+
 proc text*(self: Request, httpStatus: HttpCode, content: string): Future[void] =
   let headers = newHttpHeaders([("Content-type", "text/plain; charset=utf-8")])
   self.respond(httpStatus, content, headers)

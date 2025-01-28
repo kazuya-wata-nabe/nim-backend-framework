@@ -11,6 +11,8 @@ import src/db/conn
 
 import src/domain/user/[model, usecase/list, persist/sqlite]
 import src/controller/user/[fetch]
+import src/controller/cart/[update]
+import src/features/cart/[http_port, usecase]
 
 type Controllers = ref object
   # user: UserController
@@ -21,9 +23,9 @@ proc initRouter(c: Controllers, req: Request) {.async.} =
   # GROUP req, "/users":
   #   LIST:
   #     await c.user.fetchUsers(req)
-
-  
-  await c.cart(req)
+  # await c.cart(req)
+  if req.url.path == "/cart":
+    await CartUpdateController.invoke(req)
 
 
   GROUP req, "/pets":
@@ -40,13 +42,16 @@ proc main() {.async.} =
 
   let controllers = Controllers(
     # user: db |> newUserRepository |> newListUsecase |> newUserController,
-    cart: proc(req: Request): Future[void] = 
-      if req.url.path == "/cart":
+    cart: proc(req: Request): Future[void] =
+      if req.url.path == "/cart" and req.reqMethod == HttpGet:
         result = req.json(Http200, "data")
   )
-  
-  let router = proc(req: Request){.async.} = 
+
+  let router = proc(req: Request){.async.} =
     initRouter(controllers, req)
+
+
+    
 
   server.listen(Port settings.port)
   let port = server.getPort
