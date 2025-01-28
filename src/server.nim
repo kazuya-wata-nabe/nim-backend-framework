@@ -14,18 +14,15 @@ import src/controller/user/[fetch]
 import src/controller/cart/[update]
 import src/features/cart/[http_port, usecase]
 
-type Controllers = ref object
-  # user: UserController
-  cart: proc(req: Request): Future[void]{.gcsafe.}
 
 
-proc initRouter(c: Controllers, req: Request) {.async.} =
+template initRouter(req: Request): untyped =
   # GROUP req, "/users":
   #   LIST:
   #     await c.user.fetchUsers(req)
   # await c.cart(req)
   if req.url.path == "/cart":
-    await CartUpdateController.invoke(req)
+    await CartUpdateController.invoke(cartItemAddUsecase, req)
 
 
   GROUP req, "/pets":
@@ -35,20 +32,19 @@ proc initRouter(c: Controllers, req: Request) {.async.} =
   await req.text(Http404, $Http404)
 
 
+CartUpdateController.build(cartItemAddUsecase)
+
 proc main() {.async.} =
   var server = newAsyncHttpServer()
   let settings = newSettings()
   let db = dbConn("db.sqlite3")
 
-  let controllers = Controllers(
-    # user: db |> newUserRepository |> newListUsecase |> newUserController,
-    cart: proc(req: Request): Future[void] =
-      if req.url.path == "/cart" and req.reqMethod == HttpGet:
-        result = req.json(Http200, "data")
-  )
 
   let router = proc(req: Request){.async.} =
-    initRouter(controllers, req)
+    if req.url.path == "/cart":
+      await CartUpdateController.invoke(req)
+    #   await CartUpdateController.call()
+    await req.text(Http404, $Http404)
 
 
     
