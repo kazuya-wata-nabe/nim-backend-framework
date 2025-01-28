@@ -42,7 +42,7 @@ proc main() {.async.} =
 
   let router = proc(req: Request){.async.} =
     if req.url.path == "/cart":
-      await CartUpdateController.invoke(req)
+      await CartUpdateController.GET(req)
     #   await CartUpdateController.call()
     await req.text(Http404, $Http404)
 
