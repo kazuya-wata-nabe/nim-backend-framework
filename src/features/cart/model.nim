@@ -8,7 +8,7 @@ type ShoppingCart* = ref object
   items: seq[ShoppingCartItem]
 
 
-type CartItemAddEvent = proc(item: ShoppingCartItem): ShoppingCart
+type CartItemAddEvent* = proc(item: ShoppingCartItem): ShoppingCart
 
 
 func newShoppingCart*(): ShoppingCart = ShoppingCart(items: @[])
