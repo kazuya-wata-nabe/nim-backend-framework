@@ -1,7 +1,6 @@
 import std/asynchttpserver
 import std/asyncdispatch
 import std/strutils
-import src/lib/utils
 
 import src/db/conn
 import src/shared/router
@@ -32,13 +31,13 @@ proc main() {.async.} =
   let settings = newSettings()
   let db = dbConn("db.sqlite3")
 
-  let cont = CartUpdateController.new()
+  let cartItemAddUsecase = CartItemAddUsecase.new(newQueryService())
+  let cartUpdateController =  CartUpdateController.new(cartItemAddUsecase)
 
 
   let router = proc(req: Request){.async.} =
-    GROUP req, "/cart":
-      if req.reqMethod == HttpPut:
-        await cont.UPDATE()
+    if req.url.path == "/cart" and req.reqMethod == HttpPut:
+      await cartUpdateController.UPDATE(req)
 
     await req.respond(Http404, $Http404)
 

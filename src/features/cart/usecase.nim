@@ -11,6 +11,9 @@ type
   ShoppingCartOutDto = JsonNode
 
 
+func newQueryService*(): QueryService =
+  QueryService(cart: newShoppingCart())
+  
 func new*(_: type CartItemAddUsecase): CartItemAddUsecase =
   CartItemAddUsecase()
 

@@ -10,7 +10,10 @@ type CartUpdateController* = ref object
 func new*(_: type CartUpdateController): CartUpdateController = 
   CartUpdateController(usecase: CartItemAddUsecase())
 
-template UPDATE*(self: CartUpdateController): untyped = 
+func new*(_: type CartUpdateController, usecase: CartItemAddUsecase): CartUpdateController = 
+  CartUpdateController(usecase: usecase)
+
+proc UPDATE*(self: CartUpdateController, req: Request): Future[void] = 
   let jsonNode = parseJson("{}")
-  let data = self.usecase.invoke(jsonNode)
-  req.json(Http200, data)
+  self.usecase.invoke(jsonNode)
+  req.respond(Http200, "ok")
