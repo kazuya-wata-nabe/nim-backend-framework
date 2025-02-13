@@ -4,6 +4,7 @@ import std/strutils
 
 import src/db/conn
 import src/shared/router
+import src/dependency
 
 import src/features/cart/[usecase, controller/update]
 
@@ -33,11 +34,14 @@ proc main() {.async.} =
 
   let cartItemAddUsecase = CartItemAddUsecase.new(newQueryService())
   let cartUpdateController =  CartUpdateController.new(cartItemAddUsecase)
-
+  let deps = newDependency()
 
   let router = proc(req: Request){.async.} =
     if req.url.path == "/cart" and req.reqMethod == HttpPut:
       await cartUpdateController.UPDATE(req)
+      
+    if req.url.path == "/book" and req.reqMethod == HttpGet:
+      await deps.bookListController(req)
 
     await req.respond(Http404, $Http404)
 

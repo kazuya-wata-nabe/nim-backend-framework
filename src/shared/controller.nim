@@ -5,6 +5,7 @@ import std/asyncdispatch
 
 export asynchttpserver
 export asyncdispatch
+export json
 
 type InValidForm* = ref object
   errors: seq[string]

@@ -5,7 +5,7 @@ import std/json
 import std/tables
 import db_connector/db_sqlite
 
-import src/domain/basemodel
+import src/db/basemodel
 
 export db_sqlite.Row
 export db_sqlite.exec
