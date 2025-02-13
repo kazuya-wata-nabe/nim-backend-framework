@@ -4,10 +4,10 @@ import ./pure
 
 type 
   RentalExtensionController* = ref object
-    usecase: BookListUsecase
+    usecase: RentalUsecase
 
 
-func newRentalExtensionController*(usecase: BookListUsecase): RentalExtensionController =
+func newRentalExtensionController*(usecase: RentalUsecase): RentalExtensionController =
   RentalExtensionController(usecase: usecase)
 
 

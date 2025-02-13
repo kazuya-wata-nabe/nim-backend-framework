@@ -1,19 +1,5 @@
 import std/sugar
 import std/times
-# workflow
-#   data:
-#     - rentalId: uint 
-#     - rental_model
-#         id: rentalId
-#         name: string
-#   input:
-#     - rentalId
-#   output:
-#     - rental_model
-#   dependency:
-#     - rental_repository
-
-
 
 
 type
@@ -25,7 +11,7 @@ type
   RentalRepository = ref object
     items: seq[RentalModel]
 
-  RentalUsecase = ref object
+  RentalUsecase* = ref object
     repository: RentalRepository
 
 
@@ -44,11 +30,23 @@ func newRentalUsecase*(repository: RentalRepository): RentalUsecase =
   RentalUsecase()
 
 
+
 proc find(self: RentalRepository, id: RentalId): RentalModel =
   for item in self.items:
     if item.id == id:
       result = item
       break
+
+
+proc invoke*(self: RentalUsecase, id: RentalId): void =
+  let model = self.repository.find(id)
+  let duration = initDuration(weeks = 2)
+  let deadline = model.deadline + duration
+  if model.deadline > deadline:
+    discard
+  else:
+    discard
+
 
 
 
