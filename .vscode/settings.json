@@ -1,4 +1,5 @@
 {
   "nim.formatOnSave": true,
   "nim.buildOnSave": true,
+  "nim.lsp.path": "/Users/kazuya.watanabe/.nimble/bin"
 }

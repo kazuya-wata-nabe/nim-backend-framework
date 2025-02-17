@@ -1,12 +1,17 @@
 import std/sugar
+import std/options
 import std/times
 
 
 type
   RentalId = uint
+
+  RentalState = enum 
+    rOk, rNg
+
   RentalModel = ref object
     id: RentalId
-    deadline: DateTime
+    begin: DateTime
 
   RentalRepository = ref object
     items: seq[RentalModel]
@@ -16,13 +21,10 @@ type
 
 
 proc extend(model: RentalModel, date: DateTime): RentalModel =
-  if model.deadline > date:
-    RentalModel(
-      id: model.id,
-      deadline: model.deadline + initDuration(weeks = 2)
-    )
-  else:
-    model
+  RentalModel(
+    id: model.id,
+    begin: model.begin + initDuration(weeks = 2)
+  )
 
 
 
@@ -38,14 +40,14 @@ proc find(self: RentalRepository, id: RentalId): RentalModel =
       break
 
 
-proc invoke*(self: RentalUsecase, id: RentalId): void =
+proc invoke*(self: RentalUsecase, id: RentalId): Option[RentalModel] =
   let model = self.repository.find(id)
   let duration = initDuration(weeks = 2)
-  let deadline = model.deadline + duration
-  if model.deadline > deadline:
-    discard
+  let deadline = model.begin + duration
+  if model.begin > deadline:
+    some(RentalModel(id: model.id, begin: deadline))
   else:
-    discard
+    none(RentalModel)
 
 
 
