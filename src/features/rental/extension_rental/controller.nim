@@ -1,3 +1,4 @@
+import std/options
 import src/shared/controller
 import ./pure
 
@@ -12,5 +13,9 @@ func newRentalExtensionController*(usecase: RentalUsecase): RentalExtensionContr
 
 
 proc handleRequest*(self: RentalExtensionController, req: Request): Future[void] =
-  let data = self.usecase.invoke()
-  req.json(Http200, data)
+  let id = 1.uint
+  let data = self.usecase.invoke(id)
+  if data.isSome():
+    req.json(Http200, "ok")
+  else:
+    req.json(Http409, "ng")

@@ -1,0 +1,11 @@
+### 
+GET http://localhost:5000/book
+content-type: application/json
+
+###
+PUT http://localhost:5000/rental:extension
+content-type: application/json
+
+{
+
+}

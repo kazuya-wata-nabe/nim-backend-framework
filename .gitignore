@@ -10,3 +10,5 @@ _deps/*
 nimcache
 
 .vscode
+nimble.develop
+nimble.paths

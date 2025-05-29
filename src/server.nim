@@ -2,7 +2,6 @@ import std/asynchttpserver
 import std/asyncdispatch
 import std/strutils
 
-import src/db/conn
 import src/shared/router
 import src/dependency
 
@@ -25,12 +24,23 @@ func port*(self: Settings): uint16 =
   self.port.uint16
 
 
+template get(p, op: untyped): untyped =
+  if req.url.path == p and req.reqMethod == HttpGet:
+    await op
+  
+template post(p, op: untyped): untyped =
+  if req.url.path == p and req.reqMethod == HttpPost:
+    await op
 
+template put(p, op: untyped): untyped =
+  if req.url.path == p and req.reqMethod == HttpPut:
+    await op
+  
 
 proc main() {.async.} =
   var server = newAsyncHttpServer()
   let settings = newSettings()
-  let db = dbConn("db.sqlite3")
+
 
   let cartItemAddUsecase = CartItemAddUsecase.new(newQueryService())
   let cartUpdateController =  CartUpdateController.new(cartItemAddUsecase)
@@ -42,6 +52,8 @@ proc main() {.async.} =
       
     if req.url.path == "/book" and req.reqMethod == HttpGet:
       await deps.bookListController(req)
+
+    put "/rental:extension", deps.rentalPutController(req)
 
     await req.respond(Http404, $Http404)
 
