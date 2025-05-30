@@ -1,5 +1,5 @@
 [tasks.serve]
 run = """
-  watchexec --restart --verbose --clear --wrap-process=session
+  watchexec --restart --verbose --clear --wrap-process=session \
   --stop-signal SIGTERM --exts nim --watch src/ -- "nimble run"
 """
