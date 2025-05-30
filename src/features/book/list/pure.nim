@@ -12,9 +12,9 @@ type
   BookGetCommand = proc(id: int64): Option[BookReadModel]{.gcsafe.}
 
   BookListUsecase* = ref object
-    query: BookListCommand
+    query*: BookListCommand
   BookGetUsecase* = ref object
-    query: BookGetCommand
+    query*: BookGetCommand
 
   BookListRepositoryOnMemory = ref object
     items: seq[BookReadModel]

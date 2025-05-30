@@ -30,11 +30,15 @@ const LAYOUT = """
 </aside>
 """
 
+func layout(body: string): string =
+  STYLE & LAYOUT & 
+  "<div>" & body & "<div>"
+
 proc html(req: Request, status: HttpCode, content: string): Future[void] = 
-  req.respond(status, STYLE & LAYOUT & content, HEADERS.newHttpHeaders())
+  req.respond(status, layout content, HEADERS.newHttpHeaders())
 
 proc html(req: Request, content: string, status: HttpCode = Http200): Future[void] = 
-  req.respond(status, STYLE & LAYOUT & content, HEADERS.newHttpHeaders())
+  req.respond(status, layout content, HEADERS.newHttpHeaders())
 
 
 
@@ -42,7 +46,7 @@ proc router*(deps: Dependency, req: Request) {.async.} =
   if req.eq("/", HttpGet):
     await req.html("<div>hoge</div>")
   if req.eq("/books", HttpGet):
-    await req.html(books.list @[])
+    await req.html(books.list deps.bookListController)
 
   await req.respond(Http404, $Http404)
 
