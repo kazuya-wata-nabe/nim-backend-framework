@@ -1,4 +1,3 @@
-import std/sugar
 import std/options
 import std/times
 
@@ -61,12 +60,17 @@ proc find(self: RentalRepository, id: RentalId): Option[RentalModel] =
       break
 
 
+
 proc invoke*(self: RentalUsecase, id: RentalId): Option[RentalModel] =
   let model = self.repository.find(id)
+  if model.isNone():
+    return none(RentalModel)
+
+  let it = model.get()
   let duration = initDuration(weeks = 2)
-  let deadline = model.begin + duration
-  if model.begin > deadline:
-    some(RentalModel(id: model.id, begin: deadline))
+  let deadline = it.begin + duration
+  if it.begin > deadline:
+    some(RentalModel(id: it.id, begin: deadline))
   else:
     none(RentalModel)
 

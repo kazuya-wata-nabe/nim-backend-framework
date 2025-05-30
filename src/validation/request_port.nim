@@ -1,11 +1,8 @@
 import std/json
-import std/options
-import std/strutils
 import std/sequtils
 import std/macros
 
 import std/strformat
-import src/validation/validator
 import src/lib/parser_macros
 
 

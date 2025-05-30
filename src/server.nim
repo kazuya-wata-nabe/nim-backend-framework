@@ -2,7 +2,6 @@ import std/asynchttpserver
 import std/asyncdispatch
 import std/strutils
 
-import src/shared/router
 import src/dependency
 
 import src/features/cart/[usecase, controller/update]
