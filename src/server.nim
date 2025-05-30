@@ -33,7 +33,7 @@ proc main() {.async.} =
 
   while true:
     if server.shouldAcceptRequest():
-      await server.acceptRequest web.router
+      await server.acceptRequest web.router(deps)
     else:
       await sleepAsync(500)
 

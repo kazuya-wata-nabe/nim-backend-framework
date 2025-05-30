@@ -1,7 +1,9 @@
 import std/asynchttpserver
 import std/asyncdispatch
 
+import src/dependency
 import src/shared/router
+import src/route/web/books
 
 const HEADERS = [
   ("content-type", "text/html charset=utf8;")
@@ -31,10 +33,20 @@ const LAYOUT = """
 proc html(req: Request, status: HttpCode, content: string): Future[void] = 
   req.respond(status, STYLE & LAYOUT & content, HEADERS.newHttpHeaders())
 
+proc html(req: Request, content: string, status: HttpCode = Http200): Future[void] = 
+  req.respond(status, STYLE & LAYOUT & content, HEADERS.newHttpHeaders())
 
 
-proc router*(req: Request) {.async.} =
+
+proc router*(deps: Dependency, req: Request) {.async.} =
   if req.eq("/", HttpGet):
-    await req.html(Http200, "<div>hoge</div>")
+    await req.html("<div>hoge</div>")
+  if req.eq("/books", HttpGet):
+    await req.html(books.list @[])
 
   await req.respond(Http404, $Http404)
+
+
+proc router*(deps: Dependency): auto =
+  proc(req: Request) {.async.} =
+    await router(deps, req)

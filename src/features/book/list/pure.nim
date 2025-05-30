@@ -1,42 +1,45 @@
+import std/options
+import std/sugar
+
 type 
-  BookReadModel = ref object
-    id: int64
-    name: string
-  BookListRepository = ref object
-    items: seq[BookReadModel]
+  Book* = ref object
+    name*: string
+  BookReadModel* = ref object
+    id*: int64
+    name*: string
+
+  BookListCommand = proc(): seq[BookReadModel]{.gcsafe.}
+  BookGetCommand = proc(id: int64): Option[BookReadModel]{.gcsafe.}
+
   BookListUsecase* = ref object
-    repository: BookListRepository
+    query: BookListCommand
   BookGetUsecase* = ref object
-    repository: BookListRepository
+    query: BookGetCommand
+
+  BookListRepositoryOnMemory = ref object
+    items: seq[BookReadModel]
+
+func newBookGetUsecase*(query: BookGetCommand): BookGetUsecase =
+  BookGetUsecase(query: query)
 
 
-func newBookListUsecase*(repository: BookListRepository): BookListUsecase =
-  BookListUsecase(repository: repository)
-
-func newBookGetUsecase*(repository: BookListRepository): BookGetUsecase =
-  BookGetUsecase(repository: repository)
-
-func newBookListRepository*(): BookListRepository =
-  BookListRepository(
+func newBookListRepositoryOnMemory*(): BookListRepositoryOnMemory =
+  BookListRepositoryOnMemory(
     items: @[
       BookReadModel(id: 1, name: "aaa"),
       BookReadModel(id: 2, name: "bbbb"),
     ]
   )
 
-proc list(self: BookListRepository): seq[BookReadModel] =
-  self.items
+proc list*(self: BookListRepositoryOnMemory): BookListCommand =
+  () => self.items
 
 
-proc read(self: BookListRepository, id: int64): BookReadModel =
-  for item in self.items:
-    if item.id == id:
-      result = item
-      break
-
+func newBookListUsecase*(query: BookListCommand): BookListUsecase =
+  BookListUsecase(query: query)
 
 proc invoke*(self: BookListUsecase): seq[BookReadModel] = 
-  self.repository.list()
+  self.query()
 
-proc invoke*(self: BookGetUsecase, id: int64): BookReadModel = 
-  self.repository.read(id)
+proc invoke*(self: BookGetUsecase, id: int64): Option[BookReadModel] = 
+  self.query(id)

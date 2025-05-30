@@ -2,14 +2,15 @@ import src/features/book/list/pure
 import src/features/book/list/controller
 
 type 
-  Dependency = ref object
+  Dependency* = ref object
     bookListController*: BookListController
 
 
 proc newDependency*(): Dependency =
+  let bookRepository = newBookListRepositoryOnMemory()
   Dependency(
     bookListController: 
-      newBookListRepository().
+      bookRepository.list().
       newBookListUsecase().
       newBookListController(),
   )
