@@ -5,9 +5,12 @@ import std/strutils
 import std/re
 
 
-func match(req: Request, path: string): bool =
+func match*(req: Request, path: string): bool =
   let ptn = "^" & path & "/[a-zA-Z0-9]+"
-  match(req.url.path, re ptn)
+  re.match(req.url.path, re ptn)
+
+func eq*(req: Request, path: string, reqMethod: HttpMethod): bool =
+  req.url.path == path and req.reqMethod == reqMethod
 
 
 func slice(value: string, pos: int): string =
