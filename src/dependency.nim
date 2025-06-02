@@ -1,34 +1,22 @@
-import std/asynchttpserver
-import std/asyncdispatch
-
-import src/features/book/list/pure
+import src/features/book/pure
 import src/features/book/list/controller
-import src/features/rental/extension_rental/pure
-import src/features/rental/extension_rental/controller
+import src/features/book/create/controller
 
 type 
-  Dependency = ref object
-    bookListController: BookListController
-    rentalPutController: RentalExtensionController
+  Dependency* = ref object
+    bookListController*: BookListController
+    bookCreateController*: BookCreateController
 
 
 proc newDependency*(): Dependency =
-  let bookRepository = newBookListRepository()
-
+  let bookRepository = newBookRepositoryOnMemory()
   Dependency(
     bookListController: 
-      bookRepository.
+      bookRepository.list().
       newBookListUsecase().
       newBookListController(),
-
-    rentalPutController: 
-      newRentalRepository().
-      newRentalUsecase().
-      newRentalExtensionController(),
+    bookCreateController: 
+      bookRepository.save().
+      newBookCreateUsecase().
+      newBookCreateController(),
   )
-
-proc bookListController*(self: Dependency, req: Request): Future[void] =
-  self.bookListController.handleRequest(req)
-
-proc rentalPutController*(self: Dependency, req: Request): Future[void] =
-  self.bookListController.handleRequest(req)

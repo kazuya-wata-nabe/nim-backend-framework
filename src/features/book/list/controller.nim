@@ -1,5 +1,4 @@
-import src/shared/controller
-import ./pure
+import src/features/book/pure
 
 
 type 
@@ -10,6 +9,5 @@ func newBookListController*(usecase: BookListUsecase): BookListController =
   BookListController(usecase: usecase)
 
 
-proc handleRequest*(self: BookListController, req: Request): Future[void] =
-  let data = self.usecase.invoke()
-  req.json(Http200, data)
+proc invoke*(self: BookListController): seq[BookReadModel] =
+  self.usecase.query()

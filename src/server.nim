@@ -4,7 +4,7 @@ import std/strutils
 
 import src/dependency
 
-import src/features/cart/[usecase, controller/update]
+import src/route/web
 
 
 type Settings = ref object
@@ -18,44 +18,14 @@ func newSettings*(params: seq[string] = @[]): Settings =
     if param == "--port" and params.len >= i + 1:
       result.port = parseUInt params[i + 1]
 
-
 func port*(self: Settings): uint16 =
   self.port.uint16
 
 
-template get(p, op: untyped): untyped =
-  if req.url.path == p and req.reqMethod == HttpGet:
-    await op
-  
-template post(p, op: untyped): untyped =
-  if req.url.path == p and req.reqMethod == HttpPost:
-    await op
-
-template put(p, op: untyped): untyped =
-  if req.url.path == p and req.reqMethod == HttpPut:
-    await op
-  
-
 proc main() {.async.} =
   var server = newAsyncHttpServer()
   let settings = newSettings()
-
-
-  let cartItemAddUsecase = CartItemAddUsecase.new(newQueryService())
-  let cartUpdateController =  CartUpdateController.new(cartItemAddUsecase)
   let deps = newDependency()
-
-  let router = proc(req: Request){.async.} =
-    if req.url.path == "/cart" and req.reqMethod == HttpPut:
-      await cartUpdateController.UPDATE(req)
-      
-    if req.url.path == "/book" and req.reqMethod == HttpGet:
-      await deps.bookListController(req)
-
-    put "/rental:extension", deps.rentalPutController(req)
-
-    await req.respond(Http404, $Http404)
-
 
   server.listen(Port settings.port)
   let port = server.getPort
@@ -63,7 +33,7 @@ proc main() {.async.} =
 
   while true:
     if server.shouldAcceptRequest():
-      await server.acceptRequest(router)
+      await server.acceptRequest web.router(deps)
     else:
       await sleepAsync(500)
 
