@@ -2,8 +2,9 @@ import std/strutils
 import std/sequtils
 import std/htmlgen
 
-import src/features/book/list/pure
+import src/features/book/pure
 import src/features/book/list/controller
+import src/features/book/create/controller
 
 proc toRecord(item: BookReadModel): string =
   [
@@ -28,3 +29,10 @@ proc list*(controller: BookListController): string =
       ).join("")
     )
   )
+
+proc create*(controller: BookCreateController): string = 
+  """
+  <form action=/books/create method=POST>
+    name<input name=name >
+  </form>
+  """

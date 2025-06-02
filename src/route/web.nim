@@ -47,6 +47,8 @@ proc router*(deps: Dependency, req: Request) {.async.} =
     await req.html("<div>hoge</div>")
   if req.eq("/books", HttpGet):
     await req.html(books.list deps.bookListController)
+  if req.eq("/books/create", HttpGet):
+    await req.html(books.create deps.bookCreateController)
 
   await req.respond(Http404, $Http404)
 

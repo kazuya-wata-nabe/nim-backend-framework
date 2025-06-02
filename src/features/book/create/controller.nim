@@ -1,6 +1,5 @@
 import src/shared/controller
-import src/features/book/create/pure
-import ./pure
+import src/features/book/pure
 
 
 type 
@@ -11,5 +10,6 @@ func newBookCreateController*(usecase: BookCreateUsecase): BookCreateController 
   BookCreateController(usecase: usecase)
 
 
-proc invoke*(self: BookCreateController): seq[BookReadModel] =
-  self.usecase.query()
+proc invoke*(self: BookCreateController, body: string): seq[BookReadModel] =
+  let book = body.convertBodyToJson().to(Book)
+  self.usecase.invoke(book)

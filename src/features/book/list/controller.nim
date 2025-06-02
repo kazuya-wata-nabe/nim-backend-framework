@@ -1,6 +1,4 @@
-import src/shared/controller
-import src/features/book/list/pure
-import ./pure
+import src/features/book/pure
 
 
 type 
