@@ -11,12 +11,18 @@ type
   BookListCommand = proc(): seq[BookReadModel]{.gcsafe.}
   BookGetCommand = proc(id: int64): Option[BookReadModel]{.gcsafe.}
   BookCreateCommand = proc(book: Book): void{.gcsafe.}
+  BookUpdateCommand = proc(id: string, book: Book): void{.gcsafe.}
+  BookDeleteCommand = proc(id: string): void{.gcsafe.}
 
   BookListUsecase* = ref object
     query*: BookListCommand
-  BookGetUsecase* = ref object
+  BookReadUsecase* = ref object
     query*: BookGetCommand
   BookCreateUsecase* = ref object
+    command*: BookCreateCommand
+  BookUpdateUsecase* = ref object
+    command*: BookGetCommand
+  BookDeleteUsecase* = ref object
     command*: BookCreateCommand
 
   BookRepositoryOnMemory = ref object
@@ -25,8 +31,8 @@ type
 func to(book: Book): BookReadModel =
   BookReadModel(id: 1, name: book.name)
 
-func newBookGetUsecase*(query: BookGetCommand): BookGetUsecase =
-  BookGetUsecase(query: query)
+func newBookGetUsecase*(query: BookGetCommand): BookReadUsecase =
+  BookReadUsecase(query: query)
 
 
 func newBookRepositoryOnMemory*(): BookRepositoryOnMemory =
@@ -53,7 +59,7 @@ func newBookCreateUsecase*(command: BookCreateCommand): BookCreateUsecase =
 proc invoke*(self: BookListUsecase): seq[BookReadModel] = 
   self.query()
 
-proc invoke*(self: BookGetUsecase, id: int64): Option[BookReadModel] = 
+proc invoke*(self: BookReadUsecase, id: int64): Option[BookReadModel] = 
   self.query(id)
 
 proc invoke*(self: BookCreateUsecase, book: Book): void = 
