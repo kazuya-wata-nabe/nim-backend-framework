@@ -8,11 +8,11 @@ type
     id*: int64
     name*: string
 
-  BookListCommand = proc(): seq[BookReadModel]{.gcsafe.}
-  BookGetCommand = proc(id: int64): Option[BookReadModel]{.gcsafe.}
-  BookCreateCommand = proc(book: Book): void{.gcsafe.}
-  BookUpdateCommand = proc(id: string, book: Book): void{.gcsafe.}
-  BookDeleteCommand = proc(id: string): void{.gcsafe.}
+  BookListCommand = proc(): seq[BookReadModel]
+  BookGetCommand = proc(id: int64): Option[BookReadModel]
+  BookCreateCommand = proc(book: Book): void
+  BookUpdateCommand = proc(id: string, book: Book): void
+  BookDeleteCommand = proc(id: string): void
 
   BookListUsecase* = ref object
     query*: BookListCommand
