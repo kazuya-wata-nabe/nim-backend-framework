@@ -8,14 +8,14 @@ type
     id*: int64
     name*: string
 
-  BookListCommand = proc(): seq[BookReadModel]
-  BookGetCommand = proc(id: int64): Option[BookReadModel]
-  BookCreateCommand = proc(book: Book): void
-  BookUpdateCommand = proc(id: string, book: Book): void
-  BookDeleteCommand = proc(id: string): void
+  GetBooks = proc(): seq[BookReadModel]{.gcsafe.}
+  BookGetCommand = proc(id: int64): Option[BookReadModel]{.gcsafe.}
+  BookCreateCommand = proc(book: Book): void{.gcsafe.}
+  BookUpdateCommand = proc(id: string, book: Book): void{.gcsafe.}
+  BookDeleteCommand = proc(id: string): void{.gcsafe.}
 
   BookListUsecase* = ref object
-    query*: BookListCommand
+    query*: GetBooks
   BookReadUsecase* = ref object
     query*: BookGetCommand
   BookCreateUsecase* = ref object
@@ -43,14 +43,14 @@ func newBookRepositoryOnMemory*(): BookRepositoryOnMemory =
     ]
   )
 
-proc list*(self: BookRepositoryOnMemory): BookListCommand =
+proc list*(self: BookRepositoryOnMemory): GetBooks =
   () => self.items
 
 proc save*(self: BookRepositoryOnMemory): BookCreateCommand =
   (book: Book) => self.items.add(book.to())
 
 
-func newBookListUsecase*(query: BookListCommand): BookListUsecase =
+func newBookListUsecase*(query: GetBooks): BookListUsecase =
   BookListUsecase(query: query)
 
 func newBookCreateUsecase*(command: BookCreateCommand): BookCreateUsecase =
